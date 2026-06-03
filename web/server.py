@@ -12,9 +12,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 app = Flask(__name__)
 
-SKIP_DIRS = {'__pycache__', '.git', '.local', 'attached_assets', 'web'}
-SKIP_FILES = {'codebook.bin', 'index.db', 'hdm.matrix.npy'}
-SKIP_EXTS  = {'.pyc', '.pyo'}
+SKIP_DIRS  = {'__pycache__', '.git', '.local', 'attached_assets',
+              'web', '.pythonlibs', '.upm', '.cache', 'dist', 'build'}
+SKIP_FILES = {'codebook.bin', 'index.db', 'hdm.matrix.npy', '.replit',
+              'replit.nix', '.gitattributes', '.gitignore'}
+SKIP_EXTS  = {'.pyc', '.pyo', '.spec'}
+
+
+SAFE_DATE = (1980, 1, 1, 0, 0, 0)
 
 
 def _build_zip() -> io.BytesIO:
@@ -29,9 +34,16 @@ def _build_zip() -> io.BytesIO:
                 if os.path.splitext(fname)[1] in SKIP_EXTS:
                     continue
                 abs_path = os.path.join(root, fname)
-                arc_path = os.path.join('NexForge_UCE', rel_root, fname)
+                if rel_root == '.':
+                    arc_path = f'NexForge_UCE/{fname}'
+                else:
+                    arc_path = f'NexForge_UCE/{rel_root}/{fname}'
                 arc_path = arc_path.replace('\\', '/')
-                zf.write(abs_path, arc_path)
+                with open(abs_path, 'rb') as f:
+                    data = f.read()
+                info = zipfile.ZipInfo(arc_path, date_time=SAFE_DATE)
+                info.compress_type = zipfile.ZIP_DEFLATED
+                zf.writestr(info, data)
     buf.seek(0)
     return buf
 
