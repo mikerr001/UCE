@@ -72,13 +72,31 @@ def _run_extractor(file_path: str, file_type: str,
     ext = os.path.splitext(file_path)[1].lower()
     candidates = []
 
-    if file_type == 'image':
+    if file_type == 'image' and ext != '.svg':
         if progress_cb:
             progress_cb(0.2, 'Running Fractal IFS extractor...')
         try:
             from extractors.fractal_ifs import encode
             seed = encode(file_path)
             candidates.append((seed, 'fractal_ifs'))
+        except Exception:
+            pass
+
+    elif file_type == '3d':
+        if progress_cb:
+            progress_cb(0.2, 'Running Fractal IFS extractor (3D geometry)...')
+        try:
+            from extractors.fractal_ifs import encode
+            seed = encode(file_path)
+            candidates.append((seed, 'fractal_ifs'))
+        except Exception:
+            pass
+        if progress_cb:
+            progress_cb(0.5, 'Running Grammar Inference on 3D file...')
+        try:
+            from extractors.grammar_infer import encode
+            seed = encode(file_path)
+            candidates.append((seed, 'grammar_infer'))
         except Exception:
             pass
 

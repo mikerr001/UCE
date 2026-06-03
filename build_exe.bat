@@ -20,6 +20,8 @@ pyinstaller ^
   --hidden-import=zstd ^
   --hidden-import=tkinter ^
   --hidden-import=tkinterdnd2 ^
+  --hidden-import=cv2 ^
+  --hidden-import=wave ^
   sce.py
 
 echo.

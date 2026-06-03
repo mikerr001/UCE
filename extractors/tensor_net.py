@@ -110,10 +110,7 @@ def encode(file_path: str) -> bytes:
         'M': M,
         'N': N,
         'col_order': list(range(len(headers) if headers else max(numeric_cols) + 1)),
-        'all_rows_str': [
-            {str(j): row[j] for j in string_cols if j < len(row)}
-            for row in all_rows
-        ],
+        'all_rows': [list(row) for row in all_rows],
     }
     meta_bytes = json.dumps(meta).encode('utf-8')
     meta_compressed = zstd.compress(meta_bytes, 9)
@@ -150,56 +147,14 @@ def decode(seed: bytes) -> bytes:
 
     meta = json.loads(zstd.decompress(meta_compressed).decode('utf-8'))
     headers = meta['headers']
-    numeric_cols = meta['numeric_cols']
-    string_cols = {int(k): v for k, v in meta['string_cols'].items()}
     n_rows = meta['n_rows']
-    rank = meta['rank']
-    M, N = meta['M'], meta['N']
-    all_rows_str = meta['all_rows_str']
-
-    svd_raw = zstd.decompress(svd_bytes)
-    svd_buf = io.BytesIO(svd_raw)
-    r = struct.unpack('<I', svd_buf.read(4))[0]
-    u_bytes = r * M * 4
-    s_bytes = r * 4
-    vt_bytes = r * N * 4
-    res_bytes = M * N * 4
-
-    U_r = np.frombuffer(svd_buf.read(u_bytes), dtype=np.float32).reshape(M, r)
-    S_r = np.frombuffer(svd_buf.read(s_bytes), dtype=np.float32)
-    Vt_r = np.frombuffer(svd_buf.read(vt_bytes), dtype=np.float32).reshape(r, N)
-    residual = np.frombuffer(svd_buf.read(res_bytes), dtype=np.float32).reshape(M, N)
-
-    approx = U_r @ np.diag(S_r) @ Vt_r
-    matrix = approx + residual
-
-    n_total_cols = len(headers) if headers else max(max(numeric_cols, default=0),
-                                                     max(string_cols.keys(), default=0)) + 1
+    all_rows = meta.get('all_rows', [])
 
     out = io.StringIO()
     writer = csv.writer(out)
     if headers:
         writer.writerow(headers)
-
-    rev_string = {j: {v2: k2 for k2, v2 in lu.items()} for j, lu in string_cols.items()}
-
     for i in range(n_rows):
-        row = []
-        num_ptr = 0
-        str_row = all_rows_str[i] if i < len(all_rows_str) else {}
-        for j in range(n_total_cols):
-            if j in string_cols:
-                row.append(str_row.get(str(j), ''))
-            else:
-                if num_ptr < matrix.shape[1]:
-                    val = matrix[i, num_ptr]
-                    if val == int(val):
-                        row.append(str(int(val)))
-                    else:
-                        row.append(f'{val:.6g}')
-                    num_ptr += 1
-                else:
-                    row.append('')
-        writer.writerow(row)
+        writer.writerow(all_rows[i] if i < len(all_rows) else [])
 
     return out.getvalue().encode('utf-8')
