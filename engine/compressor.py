@@ -62,6 +62,58 @@ def compress_file(file_path: str, base_dir: str,
     }
 
 
+def compress_folder(folder_path: str, base_dir: str,
+                    progress_cb=None) -> dict:
+    """
+    Recursively compress every file in a folder and store all seeds in HDM.
+    Returns a summary dict with totals and any per-file errors.
+    progress_cb(fraction, message) is called for each file.
+    """
+    all_files = []
+    for root, dirs, files in os.walk(folder_path):
+        dirs[:] = sorted(d for d in dirs if not d.startswith('.'))
+        for fname in sorted(files):
+            if not fname.startswith('.'):
+                all_files.append(os.path.join(root, fname))
+
+    total = len(all_files)
+    if total == 0:
+        return {
+            'files': 0, 'errors': 0,
+            'original_size': 0, 'seed_size': 0, 'ratio': 0,
+            'error_list': [],
+        }
+
+    results = []
+    errors = []
+
+    for i, file_path in enumerate(all_files):
+        if progress_cb:
+            progress_cb(i / total,
+                        f'[{i + 1}/{total}] {os.path.basename(file_path)}')
+        try:
+            r = compress_file(file_path, base_dir)
+            results.append(r)
+        except Exception as e:
+            errors.append((file_path, str(e)))
+
+    if progress_cb:
+        progress_cb(1.0, f'Done — {len(results)} files compressed')
+
+    total_orig = sum(r['original_size'] for r in results)
+    total_seed = sum(r['seed_size'] for r in results)
+    ratio = round(total_orig / total_seed, 1) if total_seed > 0 else 0
+
+    return {
+        'files': len(results),
+        'errors': len(errors),
+        'original_size': total_orig,
+        'seed_size': total_seed,
+        'ratio': ratio,
+        'error_list': errors,
+    }
+
+
 def _run_extractor(file_path: str, file_type: str,
                    codebook_path: str, progress_cb=None):
     """
@@ -164,7 +216,7 @@ def _run_extractor(file_path: str, file_type: str,
         if len(seed) <= len(fallback):
             return seed, 'program_synth'
         return fallback, 'zstd_fallback'
-    except Exception as e:
+    except Exception:
         pass
 
     return _zstd_fallback(file_path), 'zstd_fallback'
