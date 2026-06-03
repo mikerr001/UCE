@@ -6,3 +6,7 @@ numpy
 Pillow
 tkinterdnd2
 zstd
+numpy
+Pillow
+tkinterdnd2
+zstd

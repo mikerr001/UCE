@@ -279,7 +279,7 @@ class UCEApp(tk.Tk):
         self.after(0, lambda: self._status_var.set(msg))
         self.after(0, lambda: self._progress.config(value=frac * 100))
 
-    def _on_init_done(self, error=None):
+    def _on_init_done(self, result=None, error=None):
         if error:
             self._status_var.set(f'Init failed: {error}')
             messagebox.showerror('Init Error', str(error))
