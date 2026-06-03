@@ -1,0 +1,5 @@
+[AutoRun]
+open=launch.bat
+icon=sce.ico
+label=NexForge UCE
+action=Launch NexForge Universal Compression Engine
