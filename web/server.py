@@ -256,6 +256,71 @@ HTML = r"""<!DOCTYPE html>
     color: var(--success); line-height: 1.8; overflow-x: auto;
   }
 
+  /* FLASH DRIVE */
+  #flashdrive { border-top: 1px solid var(--border); }
+  .usb-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px; margin-top: 40px;
+  }
+  @media (max-width: 700px) { .usb-layout { grid-template-columns: 1fr; } }
+
+  .usb-tree {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+    font-family: Consolas, monospace; font-size: 13px;
+    line-height: 2;
+  }
+  .usb-tree .root { color: var(--accent); font-weight: 700; font-size: 14px; }
+  .usb-tree .req  { color: var(--success); }
+  .usb-tree .opt  { color: var(--muted); }
+  .usb-tree .note { font-family: 'Segoe UI', sans-serif; font-size: 11px;
+                    color: #444; margin-left: 24px; display: block; }
+
+  .checklist {
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .chk {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 0; border-bottom: 1px solid var(--border);
+  }
+  .chk:last-child { border-bottom: none; }
+  .chk-icon {
+    flex-shrink: 0; width: 28px; height: 28px;
+    background: rgba(0,229,255,.08);
+    border: 1px solid rgba(0,229,255,.18);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; margin-top: 1px;
+  }
+  .chk-body h4 { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .chk-body p  { font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .chk-body code {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 6px;
+    font-family: Consolas, monospace; font-size: 12px; color: var(--success);
+  }
+  .tag-req {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    background: rgba(0,200,150,.12); color: var(--success);
+    padding: 1px 8px; border-radius: 99px; margin-left: 8px;
+    vertical-align: middle; letter-spacing: .5px;
+  }
+  .tag-opt {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    background: rgba(255,255,255,.05); color: var(--muted);
+    padding: 1px 8px; border-radius: 99px; margin-left: 8px;
+    vertical-align: middle; letter-spacing: .5px;
+  }
+  .autorun-note {
+    margin-top: 24px; padding: 16px 20px;
+    background: rgba(124,58,237,.08);
+    border: 1px solid rgba(124,58,237,.25);
+    border-radius: 10px; font-size: 13px; color: var(--muted); line-height: 1.7;
+  }
+  .autorun-note strong { color: var(--text); }
+
   /* CTA */
   .cta-section {
     text-align: center; padding: 80px 24px;
@@ -469,6 +534,118 @@ HTML = r"""<!DOCTYPE html>
         <li>Copy to flash drive with <strong>autorun.inf</strong> included</li>
       </ol>
     </div>
+  </div>
+</section>
+
+<!-- FLASH DRIVE -->
+<section id="flashdrive" style="max-width:1060px;">
+  <div class="section-label">Flash Drive Setup</div>
+  <h2 class="section-title">Put it on a USB stick.</h2>
+  <p class="section-sub">Everything you need to run NexForge UCE auto-launches
+     the moment you plug the drive into a Windows PC.</p>
+
+  <div class="usb-layout">
+
+    <!-- FILE TREE -->
+    <div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase;">Drive layout</p>
+      <div class="usb-tree">
+        <span class="root">&#128190; USB Drive (root)</span><br/>
+        <span class="req">&#9500;&#9472; autorun.inf</span>
+          <span class="note">&#8627; triggers auto-launch on plug-in</span>
+        <span class="req">&#9500;&#9472; launch.bat</span>
+          <span class="note">&#8627; starts the app (Python must be installed)</span>
+        <span class="req">&#9500;&#9472; launch_portable.bat</span>
+          <span class="note">&#8627; uses bundled Python — no install needed</span>
+        <span class="req">&#9500;&#9472; NexForge_UCE.exe</span>
+          <span class="note">&#8627; standalone .exe (built with build_exe.bat)</span>
+        <span class="req">&#9500;&#9472; sce.py</span>
+          <span class="note">&#8627; main script (if running from source)</span>
+        <span class="req">&#9500;&#9472; requirements.txt</span>
+        <span class="req">&#9500;&#9472; build_exe.bat</span>
+        <span class="req">&#9500;&#9472; engine&#47;  &nbsp;<span style="color:var(--muted)">(auto-created)</span></span>
+          <span class="note">&#8627; codebook + HDM generated on first launch</span>
+        <span class="req">&#9500;&#9472; extractors&#47;</span>
+        <span class="opt">&#9492;&#9472; python&#47; &nbsp;<span style="color:#333">(optional)</span></span>
+          <span class="note">&#8627; portable Python — for PCs without Python</span>
+      </div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase;">Step-by-step checklist</p>
+      <div class="checklist">
+
+        <div class="chk">
+          <div class="chk-icon">1</div>
+          <div class="chk-body">
+            <h4>Download &amp; unzip <span class="tag-req">required</span></h4>
+            <p>Click <strong>Download</strong> above. Unzip
+               <code>NexForge_UCE.zip</code> directly to the root of your flash drive.</p>
+          </div>
+        </div>
+
+        <div class="chk">
+          <div class="chk-icon">2</div>
+          <div class="chk-body">
+            <h4>Build the .exe <span class="tag-opt">recommended</span></h4>
+            <p>On a Windows PC with Python installed, open the drive folder and run
+               <code>build_exe.bat</code>. This produces
+               <code>dist\NexForge_UCE.exe</code> — copy it to the drive root.</p>
+          </div>
+        </div>
+
+        <div class="chk">
+          <div class="chk-icon">3</div>
+          <div class="chk-body">
+            <h4>Check <code>autorun.inf</code> is at root <span class="tag-req">required</span></h4>
+            <p>The file must sit at the very root of the drive (not inside a subfolder).
+               It tells Windows to show the AutoPlay prompt when the drive is plugged in.</p>
+          </div>
+        </div>
+
+        <div class="chk">
+          <div class="chk-icon">4</div>
+          <div class="chk-body">
+            <h4>Plug in &amp; launch <span class="tag-req">required</span></h4>
+            <p>Insert the drive. Windows shows an AutoPlay popup — click
+               <strong>"Run launch.bat"</strong> (or <strong>"Run NexForge_UCE.exe"</strong>
+               if you built the .exe). The app opens instantly.</p>
+          </div>
+        </div>
+
+        <div class="chk">
+          <div class="chk-icon">5</div>
+          <div class="chk-body">
+            <h4>First launch — engine init <span class="tag-opt">one time only</span></h4>
+            <p>On the very first run the engine generates its codebook and HDM index
+               (stored in the <code>engine\</code> folder on the drive).
+               This takes ~30 seconds. Every launch after that is instant.</p>
+          </div>
+        </div>
+
+        <div class="chk">
+          <div class="chk-icon">&#128194;</div>
+          <div class="chk-body">
+            <h4>No Python on the target PC? <span class="tag-opt">optional</span></h4>
+            <p>Download the
+               <a href="https://www.python.org/downloads/windows/" target="_blank">Windows embeddable package</a>
+               from python.org. Extract it into a <code>python\</code> subfolder on the drive.
+               <code>launch_portable.bat</code> will use it automatically — no install required.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="autorun-note">
+        <strong>&#9432; Windows 10 / 11 AutoRun note:</strong> Microsoft disabled full AutoRun for USB
+        drives by default as a security measure. The drive will still show an
+        <strong>AutoPlay popup</strong> — the user clicks once to launch. To enable fully
+        automatic launch without any click, a Group Policy change is required
+        (see <em>Help &rarr; How to Build .exe</em> inside the app for instructions).
+      </div>
+    </div>
+
   </div>
 </section>
 
