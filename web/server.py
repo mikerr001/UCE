@@ -364,7 +364,7 @@ HTML = r"""<!DOCTYPE html>
   </div>
   <div style="display:flex;gap:8px;align-items:center;">
     <a class="nav-dl" style="background:var(--accent2);color:#fff;"
-       href="https://github.com/mikerr001/NexForge-UCE/releases/latest"
+       href="https://github.com/mikerr001/UCE/releases/latest"
        target="_blank">&#8595; .exe</a>
     <a class="nav-dl" href="/download">&#8595; .zip</a>
   </div>
@@ -378,7 +378,7 @@ HTML = r"""<!DOCTYPE html>
      Every file type. Fully offline. Runs from a USB flash drive.</p>
   <div class="hero-btns">
     <a class="btn-primary"
-       href="https://github.com/mikerr001/NexForge-UCE/releases/latest"
+       href="https://github.com/mikerr001/UCE/releases/latest"
        target="_blank">
       &#8595;&nbsp; Download .exe &nbsp;<span style="font-weight:400;opacity:.75;font-size:13px;">Windows · no Python needed</span>
     </a>
@@ -674,7 +674,7 @@ HTML = r"""<!DOCTYPE html>
   <p>Free download. No account. No limits. Works on Windows, macOS, and Linux.</p>
   <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:32px;">
     <a class="btn-primary"
-       href="https://github.com/mikerr001/NexForge-UCE/releases/latest"
+       href="https://github.com/mikerr001/UCE/releases/latest"
        target="_blank"
        style="font-size:16px;padding:15px 36px;">
       &#8595;&nbsp; Download .exe &nbsp;<span style="font-weight:400;opacity:.7;font-size:13px;">Windows · pre-built</span>
@@ -686,7 +686,7 @@ HTML = r"""<!DOCTYPE html>
   </div>
   <p style="margin-top:16px;font-size:12px;color:var(--muted);">
     .exe built automatically by GitHub Actions &nbsp;&middot;&nbsp;
-    <a href="https://github.com/mikerr001/NexForge-UCE" target="_blank"
+    <a href="https://github.com/mikerr001/UCE" target="_blank"
        style="color:var(--muted);text-decoration:underline;">View source on GitHub</a>
   </p>
 </div>
