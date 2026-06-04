@@ -360,8 +360,14 @@ HTML = r"""<!DOCTYPE html>
     <a href="#how">How it works</a>
     <a href="#extractors">Engine</a>
     <a href="#install">Install</a>
+    <a href="#flashdrive">Flash Drive</a>
   </div>
-  <a class="nav-dl" href="/download">&#8595; Download</a>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <a class="nav-dl" style="background:var(--accent2);color:#fff;"
+       href="https://github.com/mikerr001/NexForge-UCE/releases/latest"
+       target="_blank">&#8595; .exe</a>
+    <a class="nav-dl" href="/download">&#8595; .zip</a>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -371,12 +377,25 @@ HTML = r"""<!DOCTYPE html>
   <p>Six specialised algorithms fused with a Hyperdimensional Memory.
      Every file type. Fully offline. Runs from a USB flash drive.</p>
   <div class="hero-btns">
-    <a class="btn-primary" href="/download">
-      &#8595;&nbsp; Download Free &nbsp;(.zip)
+    <a class="btn-primary"
+       href="https://github.com/mikerr001/NexForge-UCE/releases/latest"
+       target="_blank">
+      &#8595;&nbsp; Download .exe &nbsp;<span style="font-weight:400;opacity:.75;font-size:13px;">Windows · no Python needed</span>
     </a>
-    <a class="btn-outline" href="#how">See how it works</a>
+    <a class="btn-outline" href="/download">&#8595; Source .zip</a>
   </div>
-  <p class="hero-note">Windows &bull; macOS &bull; Linux &nbsp;&middot;&nbsp; Python 3.10+ required</p>
+  <p class="hero-note">
+    Pre-built Windows .exe via GitHub Releases &nbsp;&middot;&nbsp;
+    Source runs on Windows, macOS &amp; Linux with Python 3.10+
+  </p>
+  <div style="margin-top:24px;padding:12px 20px;background:rgba(0,229,255,.05);
+              border:1px solid rgba(0,229,255,.15);border-radius:10px;
+              font-size:12px;color:var(--muted);max-width:480px;line-height:1.7;">
+    <strong style="color:var(--text);">First time?</strong>
+    The .exe button links to GitHub Releases — click it, find
+    <strong style="color:var(--text);">NexForge_UCE.exe</strong> under Assets, and download.
+    No Python, no setup, just run.
+  </div>
 </div>
 
 <!-- STATS -->
@@ -653,7 +672,23 @@ HTML = r"""<!DOCTYPE html>
 <div class="cta-section">
   <h2>Ready to compress everything?</h2>
   <p>Free download. No account. No limits. Works on Windows, macOS, and Linux.</p>
-  <a class="btn-primary" href="/download">&#8595;&nbsp; Download NexForge UCE</a>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:32px;">
+    <a class="btn-primary"
+       href="https://github.com/mikerr001/NexForge-UCE/releases/latest"
+       target="_blank"
+       style="font-size:16px;padding:15px 36px;">
+      &#8595;&nbsp; Download .exe &nbsp;<span style="font-weight:400;opacity:.7;font-size:13px;">Windows · pre-built</span>
+    </a>
+    <a class="btn-outline" href="/download"
+       style="font-size:15px;padding:14px 28px;">
+      &#8595;&nbsp; Source .zip
+    </a>
+  </div>
+  <p style="margin-top:16px;font-size:12px;color:var(--muted);">
+    .exe built automatically by GitHub Actions &nbsp;&middot;&nbsp;
+    <a href="https://github.com/mikerr001/NexForge-UCE" target="_blank"
+       style="color:var(--muted);text-decoration:underline;">View source on GitHub</a>
+  </p>
 </div>
 
 <!-- FOOTER -->
