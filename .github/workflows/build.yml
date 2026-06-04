@@ -1,0 +1,110 @@
+name: Build NexForge_UCE.exe
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller numpy Pillow zstd tkinterdnd2 flask
+
+      - name: Build .exe
+        run: |
+          pyinstaller `
+            --onefile `
+            --windowed `
+            --name "NexForge_UCE" `
+            --add-data "engine;engine" `
+            --add-data "extractors;extractors" `
+            --add-data "ui;ui" `
+            --hidden-import=PIL `
+            --hidden-import=PIL.Image `
+            --hidden-import=PIL.PngImagePlugin `
+            --hidden-import=PIL.JpegImagePlugin `
+            --hidden-import=numpy `
+            --hidden-import=zstd `
+            --hidden-import=tkinter `
+            --hidden-import=tkinter.ttk `
+            --hidden-import=tkinterdnd2 `
+            --hidden-import=sqlite3 `
+            --hidden-import=wave `
+            --hidden-import=struct `
+            --hidden-import=zlib `
+            --collect-all tkinterdnd2 `
+            --noconfirm `
+            sce.py
+
+      - name: Create release zip
+        run: |
+          mkdir release
+          copy dist\NexForge_UCE.exe release\
+          copy autorun.inf release\
+          copy launch.bat release\
+          copy launch_portable.bat release\
+          copy requirements.txt release\
+          copy build_exe.bat release\
+          xcopy /E /I engine release\engine
+          xcopy /E /I extractors release\extractors
+          xcopy /E /I ui release\ui
+          copy sce.py release\
+          powershell Compress-Archive -Path release\* -DestinationPath NexForge_UCE_Windows.zip
+
+      - name: Upload exe as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexForge_UCE
+          path: |
+            dist\NexForge_UCE.exe
+            NexForge_UCE_Windows.zip
+          retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: "NexForge UCE — Build ${{ github.run_number }}"
+          body: |
+            ## NexForge UCE — Automatic Build
+
+            ### Download
+            - **`NexForge_UCE.exe`** — standalone Windows executable (no Python needed)
+            - **`NexForge_UCE_Windows.zip`** — full package including source, bat files, and exe
+
+            ### Flash drive setup
+            Copy these to your USB drive root:
+            ```
+            NexForge_UCE.exe
+            autorun.inf
+            launch.bat
+            launch_portable.bat
+            engine\
+            extractors\
+            ```
+
+            ### Run from source
+            ```
+            pip install -r requirements.txt
+            python sce.py
+            ```
+          files: |
+            dist/NexForge_UCE.exe
+            NexForge_UCE_Windows.zip
+          draft: false
+          prerelease: false
