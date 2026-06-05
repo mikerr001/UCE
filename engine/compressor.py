@@ -164,7 +164,15 @@ def _run_extractor(file_path: str, file_type: str,
 
     elif file_type in ('document', 'code', 'structured'):
         if progress_cb:
-            progress_cb(0.15, 'Running Program Synthesis...')
+            progress_cb(0.10, 'Running Semantic Domain Encoder...')
+        try:
+            from extractors.semantic_sde import encode
+            seed = encode(file_path)
+            candidates.append((seed, 'semantic_sde'))
+        except Exception:
+            pass
+        if progress_cb:
+            progress_cb(0.30, 'Running Program Synthesis...')
         try:
             from extractors.program_synth import encode
             seed = encode(file_path)
@@ -172,7 +180,7 @@ def _run_extractor(file_path: str, file_type: str,
         except Exception:
             pass
         if progress_cb:
-            progress_cb(0.35, 'Running Grammar Inference...')
+            progress_cb(0.50, 'Running Grammar Inference...')
         try:
             from extractors.grammar_infer import encode
             seed = encode(file_path)
@@ -289,6 +297,10 @@ def _run_decoder(extractor: str, seed_blob: bytes,
     if extractor == 'holographic':
         from extractors.holographic import decode
         return decode(seed_blob, codebook_path)
+
+    if extractor == 'semantic_sde':
+        from extractors.semantic_sde import decode
+        return decode(seed_blob)
 
     if extractor == 'program_synth':
         from extractors.program_synth import decode

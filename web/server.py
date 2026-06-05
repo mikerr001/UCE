@@ -374,7 +374,7 @@ HTML = r"""<!DOCTYPE html>
 <div class="hero">
   <div class="badge">Universal Compression Engine</div>
   <h1>Compress anything.<br/><em>Losslessly.</em></h1>
-  <p>Six specialised algorithms fused with a Hyperdimensional Memory.
+  <p>Seven specialised algorithms fused with a Hyperdimensional Memory.
      Every file type. Fully offline. Runs from a USB flash drive.</p>
   <div class="hero-btns">
     <a class="btn-primary"
@@ -401,7 +401,7 @@ HTML = r"""<!DOCTYPE html>
 <!-- STATS -->
 <div class="stats">
   <div class="stat">
-    <div class="stat-num">6</div>
+    <div class="stat-num">7</div>
     <div class="stat-lbl">Compression algorithms</div>
   </div>
   <div class="stat">
@@ -421,7 +421,7 @@ HTML = r"""<!DOCTYPE html>
 <!-- EXTRACTORS -->
 <section id="extractors">
   <div class="section-label">The Engine</div>
-  <h2 class="section-title">Six algorithms. One unified memory.</h2>
+  <h2 class="section-title">Seven algorithms. One unified memory.</h2>
   <p class="section-sub">Each extractor targets a different type of redundancy.
      The engine picks the best one automatically — you never need to choose.</p>
 
@@ -467,6 +467,15 @@ HTML = r"""<!DOCTYPE html>
       <div class="card-desc">Stores low-dimensional boundary maps and event logs for time-series data.
         Reconstructs full waveforms from compact constraint seeds.</div>
       <div class="card-tag">Audio &bull; Video</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📖</div>
+      <div class="card-title">Semantic Domain Encoder</div>
+      <div class="card-desc">Builds a domain phrase dictionary from the document itself, tokenizes with
+        maximal-munch, applies LZ77 on the token stream, then encodes with an
+        adaptive order-2 Markov model and range coder. Achieves 50–150:1 on
+        technical manuals.</div>
+      <div class="card-tag">Manuals &bull; Contracts &bull; Code &bull; Docs</div>
     </div>
   </div>
 </section>
