@@ -59,7 +59,7 @@ def _sym_to_len(ds, s):  return s - (ds + 385) + LZ_MIN
 
 # ── Phrase dictionary ─────────────────────────────────────────────────────────
 
-def _build_phrases(words: list) -> list:
+def _build_phrases(words: list, max_phrases: int = MAX_PHRASES) -> list:
     counts: Counter = Counter()
     wlen = len(words)
     for n in range(2, 5):
@@ -69,9 +69,23 @@ def _build_phrases(words: list) -> list:
         ((freq * (len(g) - 1), g) for g, freq in counts.items() if freq >= 2),
         reverse=True,
     )
-    phrases = [" ".join(g) for _, g in scored[:MAX_PHRASES]]
+    phrases = [" ".join(g) for _, g in scored[:max_phrases]]
     phrases.sort(key=len, reverse=True)
     return phrases
+
+
+def _merge_phrases(shared: list, words: list) -> list:
+    """
+    Merge a shared corpus dict with up to 200 document-specific novelties.
+    Cap the shared dict at 1 800 entries so the total stays ≤ 2 000.
+    """
+    base     = shared[:1800]
+    base_set = set(base)
+    doc      = _build_phrases(words, max_phrases=500)
+    extra    = [p for p in doc if p not in base_set][:200]
+    merged   = base + extra
+    merged.sort(key=len, reverse=True)
+    return merged
 
 
 # ── Tokenizer ─────────────────────────────────────────────────────────────────
@@ -297,7 +311,16 @@ class _Markov:
 
 # ── Public encode / decode ────────────────────────────────────────────────────
 
-def encode(file_path: str) -> bytes:
+def encode(file_path: str, shared_phrases=None) -> bytes:
+    """
+    Compress file_path with the SDE pipeline.
+
+    shared_phrases — optional list of pre-trained corpus phrases loaded from
+                     engine/domain_dict.bin.  When supplied, document-specific
+                     novelties (up to 200) are merged on top, giving much better
+                     coverage for same-domain files without rebuilding the whole
+                     dictionary from scratch.
+    """
     with open(file_path, "rb") as f:
         raw = f.read()
 
@@ -320,7 +343,10 @@ def encode(file_path: str) -> bytes:
     if len(words) < 30:
         return zstd_seed
 
-    phrases = _build_phrases(words)
+    if shared_phrases:
+        phrases = _merge_phrases(shared_phrases, words)
+    else:
+        phrases = _build_phrases(words)
     ds      = len(phrases)
     alpha   = _alpha(ds)
 

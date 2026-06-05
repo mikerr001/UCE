@@ -163,11 +163,19 @@ def _run_extractor(file_path: str, file_type: str,
             pass
 
     elif file_type in ('document', 'code', 'structured'):
+        _shared = None
+        try:
+            _base_dir = os.path.dirname(os.path.dirname(codebook_path))
+            from engine.domain_dict import load as _load_dict
+            _shared = _load_dict(_base_dir)
+        except Exception:
+            pass
         if progress_cb:
-            progress_cb(0.10, 'Running Semantic Domain Encoder...')
+            hint = ' (domain dict active)' if _shared else ''
+            progress_cb(0.10, f'Running Semantic Domain Encoder{hint}...')
         try:
             from extractors.semantic_sde import encode
-            seed = encode(file_path)
+            seed = encode(file_path, shared_phrases=_shared)
             candidates.append((seed, 'semantic_sde'))
         except Exception:
             pass

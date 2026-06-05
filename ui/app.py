@@ -78,6 +78,8 @@ class UCEApp(tk.Tk):
         file_menu.add_command(label='Compress File…',    command=self._browse_compress)
         file_menu.add_command(label='Compress Folder…',  command=self._browse_folder)
         file_menu.add_separator()
+        file_menu.add_command(label='Train Domain Dict…', command=self._train_domain_dict)
+        file_menu.add_separator()
         file_menu.add_command(label='Retrieve Selected', command=self._retrieve_selected)
         file_menu.add_separator()
         file_menu.add_command(label='Exit',              command=self.destroy)
@@ -110,6 +112,10 @@ class UCEApp(tk.Tk):
         self._hdm_label = tk.Label(hdr, text='HDM: initialising…',
                                    font=FONT_SMALL, bg=PANEL_BG, fg=TEXT_SEC)
         self._hdm_label.pack(side='right', padx=20, pady=14)
+
+        self._dict_label = tk.Label(hdr, text='Domain dict: none',
+                                    font=FONT_SMALL, bg=PANEL_BG, fg=TEXT_SEC)
+        self._dict_label.pack(side='right', padx=4, pady=14)
 
         sep = tk.Frame(self, bg=BORDER, height=1)
         sep.pack(fill='x', side='top')
@@ -330,6 +336,7 @@ class UCEApp(tk.Tk):
             self._status_var.set('Engine ready.')
             self._hdm_label.config(text='HDM: ready', fg=SUCCESS)
             self._refresh_list()
+            self._update_dict_status()
         else:
             self._status_var.set('First-time setup — initialising engine…')
             self._run_in_thread(
@@ -351,6 +358,7 @@ class UCEApp(tk.Tk):
             self._hdm_label.config(text='HDM: ready', fg=SUCCESS)
             self._progress.config(value=0)
             self._refresh_list()
+            self._update_dict_status()
 
     def _on_drop(self, event):
         paths = self.tk.splitlist(event.data)
@@ -715,14 +723,18 @@ class UCEApp(tk.Tk):
         sep.pack(fill='x', padx=30, pady=16)
 
         about_text = (
-            "Six specialised seed extractors fused with a\n"
+            "Seven specialised seed extractors fused with a\n"
             "Hyperdimensional Memory (HDM) for extreme compression.\n\n"
             "  Fractal IFS     — images, 3D geometry (self-similarity)\n"
             "  Tensor Networks — tabular/CSV (low-rank SVD)\n"
             "  Grammar Infer   — text, code, documents\n"
             "  Program Synth   — numeric sequences & patterns\n"
             "  Holographic CB  — random/encrypted data\n"
-            "  Boundary Ext.   — video & audio\n\n"
+            "  Boundary Ext.   — video & audio\n"
+            "  Semantic SDE    — manuals/docs (phrase dict + Markov\n"
+            "                    + LZ77 + range coder; 50–150:1)\n\n"
+            "Train a domain dictionary via File → Train Domain Dict…\n"
+            "to boost SDE ratios across a whole library of documents.\n\n"
             "Every file type is guaranteed lossless.\n"
             "All seeds stored in a SQLite-backed HDM with\n"
             "content-addressable recall via hypervectors.\n\n"
@@ -741,6 +753,68 @@ class UCEApp(tk.Tk):
         tk.Button(win, text='Close', command=win.destroy,
                   font=FONT_SMALL, bg=PANEL_BG, fg=ACCENT,
                   relief='flat', padx=12, pady=4, cursor='hand2').pack(pady=16)
+
+    def _update_dict_status(self):
+        try:
+            from engine.domain_dict import is_trained, load
+            if is_trained(BASE_DIR):
+                phrases = load(BASE_DIR)
+                n = len(phrases) if phrases else 0
+                self._dict_label.config(
+                    text=f'Domain dict: {n:,} phrases', fg=SUCCESS)
+            else:
+                self._dict_label.config(
+                    text='Domain dict: none', fg=TEXT_SEC)
+        except Exception:
+            self._dict_label.config(text='Domain dict: none', fg=TEXT_SEC)
+
+    def _train_domain_dict(self):
+        if self._busy:
+            messagebox.showwarning('Busy',
+                                   'Wait for the current operation to finish.')
+            return
+        folder = filedialog.askdirectory(
+            title='Select a folder of documents to train the domain dictionary on')
+        if not folder:
+            return
+
+        self._busy = True
+        name = os.path.basename(folder)
+        self._status_var.set(f'Training domain dict on "{name}"…')
+        self._progress.config(value=0)
+        self._result_label.config(text='')
+
+        def _do():
+            from engine.domain_dict import train
+            return train(folder, BASE_DIR, progress_cb=self._compress_progress)
+
+        self._run_in_thread(_do, on_done=self._on_train_done)
+
+    def _on_train_done(self, result=None, error=None):
+        self._busy = False
+        self._progress.config(value=0)
+        self._prog_label.config(text='')
+
+        if error:
+            self._status_var.set(f'Training failed: {error}')
+            messagebox.showerror('Training Error', str(error))
+            return
+
+        n_phrases = result.get('phrases', 0)
+        n_files   = result.get('files', 0)
+        self._status_var.set(
+            f'Domain dict ready — {n_phrases:,} phrases from {n_files} file(s).')
+        self._result_label.config(
+            text=f'Domain dict: {n_phrases:,} phrases  ({n_files} files scanned)',
+            fg=SUCCESS)
+        self._update_dict_status()
+        messagebox.showinfo(
+            'Domain Dictionary Trained',
+            f'Built from {n_files} file(s).\n'
+            f'{n_phrases:,} domain phrases saved to engine/domain_dict.bin.\n\n'
+            f'The Semantic Domain Encoder will now use these phrases\n'
+            f'for every text file you compress in this domain.',
+        )
 
     def _run_in_thread(self, fn, on_done=None):
         def _worker():
